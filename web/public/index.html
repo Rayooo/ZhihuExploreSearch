@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hello</title>
+    <script src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+</head>
+<body>
+    <input type="text" id="content">
+    <button onclick="send()">确定</button>
+
+    <script>
+
+        var ip = "http://localhost:8080/";
+
+        function send() {
+            $.post(ip + "search/content",{content:$("#content").val()},function (data) {
+                console.log(data);
+            })
+        }
+    </script>
+
+</body>
+</html>
