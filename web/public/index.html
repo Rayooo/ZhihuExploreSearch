@@ -9,6 +9,10 @@
     <input type="text" id="content">
     <button onclick="send()">确定</button>
 
+    <div id="result">
+
+    </div>
+
     <script>
 
         var ip = "http://localhost:8080/";
@@ -16,6 +20,7 @@
         function send() {
             $.post(ip + "search/content",{content:$("#content").val()},function (data) {
                 console.log(data);
+                $("#result").html(data);
             })
         }
     </script>
