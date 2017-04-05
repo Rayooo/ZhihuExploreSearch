@@ -1,12 +1,15 @@
 package com.ray.domain;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.solr.client.solrj.beans.Field;
 
 /**
  * Created by Ray on 2017/4/5.
  */
 public class Question {
+    @Field
     private String question;
+    @Field
     private String url;
 
     public Question(String question, String url) {
@@ -38,5 +41,10 @@ public class Question {
     @Override
     public int hashCode() {
         return question.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "{question:"+question+",url:" + url +"}";
     }
 }
