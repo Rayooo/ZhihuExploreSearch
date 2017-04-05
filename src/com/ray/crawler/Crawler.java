@@ -10,7 +10,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,7 +20,7 @@ import java.util.*;
  */
 public class Crawler {
 
-    private void getAnswer(HashSet<Question> questionHashSet) throws IOException {
+    public Set<Answer> getAnswer(HashSet<Question> questionHashSet) throws IOException {
         Set<Answer> answerHashSet = Collections.synchronizedSet(new HashSet<Answer>());
         for (Question question : questionHashSet) {
             Document doc = Jsoup.connect(question.getUrl()).get();
@@ -34,12 +33,13 @@ public class Crawler {
 
         Path answerFile = Paths.get("answer.json");
         Files.write(answerFile, (new Gson()).toJson(answerHashSet).getBytes());
+        return answerHashSet;
     }
 
-    private HashSet<Question> getQuestion() throws IOException {
+    public HashSet<Question> getQuestion() throws IOException {
         HashSet<Question> questionHashSet = new HashSet<>();
 
-        for (int i = 0; i < 100; i+=5) {
+        for (int i = 0; i < 5; i+=5) {
             String param = "{\"offset\":"+ i +",\"type\":\"day\"}";
             String requestUrl = "https://www.zhihu.com/node/ExploreAnswerListV2";
 

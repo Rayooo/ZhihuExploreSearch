@@ -1,5 +1,7 @@
 package com.ray.domain;
 
+import org.apache.solr.client.solrj.beans.Field;
+
 /**
  * Created by Ray on 2017/4/5.
  */
