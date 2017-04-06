@@ -1,5 +1,6 @@
 package com.ray.controller;
 
+import com.ray.search.SolrSearch;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -8,6 +9,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import sun.jvm.hotspot.oops.Instance;
 
 import javax.servlet.http.HttpServletResponse;
@@ -22,24 +24,28 @@ import java.io.InputStreamReader;
 @RequestMapping("search")
 public class SearchController {
 
-    @RequestMapping("content")
-    public void content(@RequestParam("content")String content, HttpServletResponse response) throws IOException {
+    @ResponseBody
+    @RequestMapping(value = "content" , produces = "text/html;charset=UTF-8")
+    public String content(@RequestParam("content")String content, HttpServletResponse response) throws IOException {
 
-        String url = "http://localhost:8983/solr/gettingstarted/select?indent=on&q=" + content + "&wt=json";
-        CloseableHttpClient client = HttpClientBuilder.create().build();
-        HttpGet httpGet = new HttpGet(url);
-        HttpResponse res = client.execute(httpGet);
-        BufferedReader rd = new BufferedReader(new InputStreamReader(res.getEntity().getContent()));
-
-        StringBuilder result = new StringBuilder();
-        String line = "";
-        while ((line = rd.readLine()) != null) {
-            result.append(line);
-        }
-
-        response.setContentType("text/html; charset=UTF-8");
-        response.getWriter().println(result);
+        SolrSearch solrSearch = new SolrSearch();
+        return solrSearch.query(content);
     }
 
+    @ResponseBody
+    @RequestMapping(value = "crawler")
+    public String crawler(){
+        SolrSearch solrSearch = new SolrSearch();
+        solrSearch.solrIndex();
+        return "SUCCESS";
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "delete")
+    public String delete(){
+        SolrSearch solrSearch = new SolrSearch();
+        solrSearch.delete();
+        return "SUCCESS";
+    }
 
 }

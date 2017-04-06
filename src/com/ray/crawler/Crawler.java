@@ -9,10 +9,12 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -31,7 +33,13 @@ public class Crawler {
             }
         }
 
-        Path answerFile = Paths.get("answer.json");
+        SimpleDateFormat dt = new SimpleDateFormat("yyyyMMddhhmmss");
+        String path = "answers/"+ dt.format(new Date()) +"question.json";
+        File folder=new File("answers");
+        if(!folder.exists()){
+            folder.mkdirs();
+        }
+        Path answerFile = Paths.get(path);
         Files.write(answerFile, (new Gson()).toJson(answerHashSet).getBytes());
         return answerHashSet;
     }
@@ -58,7 +66,16 @@ public class Crawler {
         String jsonString = JSON.toJSONString(questionHashSet);
         byte[] jsonBytes = JSON.toJSONBytes(questionHashSet);
         System.out.println(Arrays.toString(jsonBytes));
-        Path file = Paths.get("question.json");
+
+        SimpleDateFormat dt = new SimpleDateFormat("yyyyMMddhhmmss");
+        String path = "answers/"+ dt.format(new Date()) +"question.json";
+
+        File folder=new File("answers");
+        if(!folder.exists()){
+            folder.mkdirs();
+        }
+
+        Path file = Paths.get(path);
         Files.write(file, jsonBytes);
 
         return questionHashSet;
