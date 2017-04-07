@@ -15,10 +15,7 @@ import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by Ray on 2017/4/5.
@@ -47,6 +44,8 @@ public class SolrSearch {
             HashSet<Question> q = crawler.getQuestion();
             answers = crawler.getAnswer(q);
             solr.addBeans(answers);
+            solr.commit();
+
         } catch (IOException | SolrServerException e) {
             e.printStackTrace();
         }
@@ -56,6 +55,7 @@ public class SolrSearch {
     public void delete(){
         try {
             solr.deleteByQuery("*");
+            solr.commit();
         } catch (SolrServerException | IOException e) {
             e.printStackTrace();
         }
@@ -63,8 +63,12 @@ public class SolrSearch {
 
     //solr查询方法
     public String query(String queryString){
+        String questionQueryString = "questionString:*"+queryString+"*";
+        String answerQueryString = "answer:*"+queryString+"*";
+
         SolrQuery query = new SolrQuery();
-        query.setQuery(queryString);
+        query.setQuery(questionQueryString);
+
         ArrayList<HashMap<String,String>> result = new ArrayList<>();
 
         try {
@@ -80,6 +84,16 @@ public class SolrSearch {
                     result.add(m);
                 }
             }
+            QueryResponse response2 = solr.query(new SolrQuery().setQuery(answerQueryString));
+            for (SolrDocument document : response2.getResults()) {
+                //getFieldNames 得到每一个字段的名称
+                for (String s : document.getFieldNames()) {
+                    HashMap<String,String> m = new HashMap<>();
+                    m.put(s,document.get(s).toString());
+                    result.add(m);
+                }
+            }
+
 
         } catch (SolrServerException | IOException e) {
             e.printStackTrace();

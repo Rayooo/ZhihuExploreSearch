@@ -11,6 +11,7 @@ import org.jsoup.select.Elements;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.channels.AsynchronousByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -22,16 +23,29 @@ import java.util.*;
  */
 public class Crawler {
 
+    private int id = 0;
+
     public Set<Answer> getAnswer(HashSet<Question> questionHashSet) throws IOException {
         Set<Answer> answerHashSet = Collections.synchronizedSet(new HashSet<Answer>());
-        for (Question question : questionHashSet) {
-            Document doc = Jsoup.connect(question.getUrl()).get();
-            Elements answers = doc.select(".CopyrightRichText-richText");
-            for(Element e : answers){
-                System.out.println(e.text());
-                answerHashSet.add(new Answer(question,e.text()));
+
+        questionHashSet.forEach((question -> {
+            Document doc = null;
+            synchronized (this){
+                try {
+                    doc = Jsoup.connect(question.getUrl()).get();
+                    Elements answers = doc.select(".CopyrightRichText-richText");
+                    for(Element e : answers){
+                        id ++;
+                        System.out.println(e.text());
+                        answerHashSet.add(new Answer(id, question,e.text()));
+                        System.out.println(id);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-        }
+        }));
+
 
         SimpleDateFormat dt = new SimpleDateFormat("yyyyMMddhhmmss");
         String path = "answers/"+ dt.format(new Date()) +"question.json";
@@ -47,7 +61,7 @@ public class Crawler {
     public HashSet<Question> getQuestion() throws IOException {
         HashSet<Question> questionHashSet = new HashSet<>();
 
-        for (int i = 0; i < 5; i+=5) {
+        for (int i = 0; i < 80; i+=5) {
             String param = "{\"offset\":"+ i +",\"type\":\"day\"}";
             String requestUrl = "https://www.zhihu.com/node/ExploreAnswerListV2";
 
